@@ -5,9 +5,7 @@ import io.core9.plugin.widgets.datahandler.DataHandler;
 import io.core9.plugin.widgets.datahandler.DataHandlerDefaultConfig;
 import io.core9.plugin.widgets.datahandler.DataHandlerFactoryConfig;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -29,19 +27,10 @@ public class DashboardPluginsDatahandlerImpl implements	DashboardPluginsDatahand
 			}
 
 			@Override
-			@SuppressWarnings("unchecked")
 			public Map<String, Object> handle(Request req) {
 				Map<String,Object> result = new HashMap<String,Object>();
-				List<String> jsfiles = new ArrayList<String>();
-				List<String> ngmods = new ArrayList<String>();
 				Map<String,Object> dashboardConf = dashboard.getDashboardConfig(req.getVirtualHost());
-				List<Map<String,String>> modules = (List<Map<String, String>>) dashboardConf.get("modules");
-				for(Map<String,String> module : modules) {
-					jsfiles.add(module.get("filepath"));
-					ngmods.add(module.get("modulename"));
-				}
-				result.put("jsfiles", jsfiles);
-				result.put("ngmods", ngmods);
+				result.put("jsfiles", dashboardConf.get("modules"));
 				return result;
 			}
 		};
