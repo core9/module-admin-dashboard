@@ -8,6 +8,7 @@ import io.core9.plugin.widgets.datahandler.DataHandlerFactoryConfig;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,9 +34,22 @@ public class DashboardPluginsDatahandlerImpl implements	DashboardPluginsDatahand
 			public Map<String, Object> handle(Request req) {
 				Map<String,Object> result = new HashMap<String,Object>();
 				Map<String,Object> dashboardConf = dashboard.getDashboardConfig(req.getVirtualHost());
+				Set<String> jsPlugins = new LinkedHashSet<String>();
 				@SuppressWarnings("unchecked")
-				Set<String> set = new LinkedHashSet<String>((Collection<? extends String>) dashboardConf.get("modules"));
-				result.put("jsfiles", set);
+				List<Map<String,Object>> modules = ((List<Map<String,Object>>) dashboardConf.get("modules"));
+				for(Map<String,Object> module : modules) {
+					@SuppressWarnings("unchecked")
+					List<String> dependencies = (List<String>) module.get("dependencies");
+					if(dependencies != null) {
+						for(String dependency : dependencies) {
+							if(!jsPlugins.contains(dependency)) {
+								jsPlugins.add(dependency);
+							}
+						}
+					}
+					jsPlugins.add((String) module.get("file"));
+				}
+				result.put("jsfiles", jsPlugins);
 				return result;
 			}
 		};

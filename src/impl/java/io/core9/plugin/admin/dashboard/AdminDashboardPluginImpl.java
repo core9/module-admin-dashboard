@@ -24,10 +24,10 @@ public class AdminDashboardPluginImpl implements AdminDashboardPlugin {
 	@SuppressWarnings("unchecked")
 	public void removeDashboardPlugin(VirtualHost vhost, String file) {
 		Map<String,Object> modulesConf = getDashboardConfig(vhost);
-		List<String> modules = (List<String>) modulesConf.get(CONFIG_MODULES_NAME);
-		for(Iterator<String> it = modules.iterator(); it.hasNext();) {
-			String module = it.next();
-			if(module.equals(file)) {
+		List<Map<String,Object>> modules = (List<Map<String,Object>>) modulesConf.get(CONFIG_MODULES_NAME);
+		for(Iterator<Map<String,Object>> it = modules.iterator(); it.hasNext();) {
+			Map<String,Object> module = it.next();
+			if(module.get("file").equals(file)) {
 				it.remove();
 			}
 		}
@@ -38,15 +38,11 @@ public class AdminDashboardPluginImpl implements AdminDashboardPlugin {
 	@SuppressWarnings("unchecked")
 	public void addDashboardPlugin(VirtualHost vhost, String filepath, List<String> dependencies) {
 		Map<String,Object> modulesConf = getDashboardConfig(vhost);
-		List<String> modules = (List<String>) modulesConf.get(CONFIG_MODULES_NAME);
-		if(dependencies != null && dependencies.size() > 0) {
-			for(String dependency : dependencies) {
-				if(!modules.contains(dependency)) {
-					modules.add(dependency);
-				}
-			}
-		}
-		modules.add(filepath);
+		List<Map<String,Object>> modules = (List<Map<String,Object>>) modulesConf.get(CONFIG_MODULES_NAME);
+		Map<String,Object> module = new HashMap<String,Object>();
+		module.put("file", filepath);
+		module.put("dependencies", dependencies);
+		modules.add(module);
 		configRepository.updateConfig(vhost, "dashboard", (String) modulesConf.get("_id"), modulesConf);
 	}
 	
@@ -70,7 +66,7 @@ public class AdminDashboardPluginImpl implements AdminDashboardPlugin {
 	private Map<String,Object> createStandardModuleConfiguration() {
 		Map<String,Object> newConfig = new HashMap<String,Object>();
 		newConfig.put("type", CONFIG_MODULES_NAME);
-		newConfig.put(CONFIG_MODULES_NAME, new ArrayList<String>());
+		newConfig.put(CONFIG_MODULES_NAME, new ArrayList<Map<String,Object>>());
 		return newConfig;
 	}
 
