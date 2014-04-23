@@ -5,8 +5,11 @@ import io.core9.plugin.widgets.datahandler.DataHandler;
 import io.core9.plugin.widgets.datahandler.DataHandlerDefaultConfig;
 import io.core9.plugin.widgets.datahandler.DataHandlerFactoryConfig;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
@@ -30,7 +33,9 @@ public class DashboardPluginsDatahandlerImpl implements	DashboardPluginsDatahand
 			public Map<String, Object> handle(Request req) {
 				Map<String,Object> result = new HashMap<String,Object>();
 				Map<String,Object> dashboardConf = dashboard.getDashboardConfig(req.getVirtualHost());
-				result.put("jsfiles", dashboardConf.get("modules"));
+				@SuppressWarnings("unchecked")
+				Set<String> set = new LinkedHashSet<String>((Collection<? extends String>) dashboardConf.get("modules"));
+				result.put("jsfiles", set);
 				return result;
 			}
 		};
